@@ -1,0 +1,659 @@
+import random
+from copy import deepcopy
+
+import pandas as pd
+import streamlit as st
+
+st.set_page_config(
+    page_title="KalaSutra - Local Cultural & Artisan Platform",
+    page_icon="🕉️",
+    layout="wide",
+)
+
+
+CATEGORY_COLORS = {
+    "Dramatics": "#e63946",
+    "Music": "#1d3557",
+    "Dance": "#2a9d8f",
+    "Rituals": "#7209b7",
+    "Heritage Experiences": "#e9c46a",
+    "Handicrafts": "#f4a261",
+}
+
+AREAS = [
+    "Bengaluru - Malleshwaram",
+    "Bengaluru - Indiranagar",
+    "Bengaluru - Jayanagar",
+    "Mysuru - Cultural Zone",
+    "Hampi - Heritage Quarter",
+    "Jaipur - Pink City Arts",
+]
+
+AREA_CENTERS = {
+    "Bengaluru - Malleshwaram": (12.9966, 77.5713),
+    "Bengaluru - Indiranagar": (12.9784, 77.6408),
+    "Bengaluru - Jayanagar": (12.9250, 77.5938),
+    "Mysuru - Cultural Zone": (12.2958, 76.6394),
+    "Hampi - Heritage Quarter": (15.3350, 76.4600),
+    "Jaipur - Pink City Arts": (26.9239, 75.8267),
+}
+
+CRAFT_SUBCATEGORIES = [
+    "Jewellery",
+    "Bags",
+    "Clothes",
+    "Home Decor",
+    "Footwear",
+    "Paintings",
+    "Furniture",
+]
+
+
+BASE_LISTINGS = [
+    {
+        "id": "CUST-101",
+        "artistName": "Yakshagana Kala Kendra",
+        "category": "Dramatics",
+        "location": "Bengaluru - Malleshwaram",
+        "title": "Traditional Yakshagana Epic: Sugriva Vijaya",
+        "language": "Kannada",
+        "genre": "Folk Mythological Drama",
+        "baseCost": 500,
+        "createdBy": "Guru Shankara Bhat",
+        "aboutExp": "A high-energy traditional night theater performance featuring elaborate facial makeup, vibrant costumes, and rhythmic drum beat improvisations.",
+        "aboutArtist": "Preserving 400-year-old coastal Karnataka folk theater styles with over 1,200 stage performances nationwide.",
+        "history": "Yakshagana originated in coastal Karnataka as a temple art form blending music, dance, and unscripted Kannada dialogues.",
+        "img": "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80",
+        "allowOfflinePay": True,
+        "mapX": 0.25,
+        "mapY": 0.35,
+        "isSeatedShow": True,
+    },
+    {
+        "id": "CUST-102",
+        "artistName": "Carnatic Strings Ensemble",
+        "category": "Music",
+        "location": "Bengaluru - Malleshwaram",
+        "title": "Classical Veena & Flute Morning Ragas",
+        "language": "Sanskrit / Instrumental",
+        "genre": "Carnatic Classical Music",
+        "baseCost": 750,
+        "createdBy": "Vidwan Dr. Raghavan",
+        "aboutExp": "An intimate acoustic classical concert exploring soulful ragas, rhythmic solo passages, and ancient South Indian compositions.",
+        "aboutArtist": "Renowned Veena virtuoso with 30 years of devotion to classic South Indian musical heritage.",
+        "history": "Carnatic music traces back to ancient Vedic chants, emphasized heavily during the Vijayanagara Empire era.",
+        "img": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
+        "allowOfflinePay": True,
+        "mapX": 0.60,
+        "mapY": 0.25,
+        "isSeatedShow": True,
+    },
+    {
+        "id": "CUST-103",
+        "artistName": "Nritya Natya Guild",
+        "category": "Dance",
+        "location": "Bengaluru - Malleshwaram",
+        "title": "Bharatanatyam Recital: Abhinaya & Sculptural Poses",
+        "language": "Tamil / Sanskrit",
+        "genre": "Classical Dance",
+        "baseCost": 600,
+        "createdBy": "Smt. Rukmini Devi Troupe",
+        "aboutExp": "Mesmerizing recital showcasing intricate footwork, hand mudras, and expressive storytelling based on classical poetry.",
+        "aboutArtist": "Award-winning troupe dedicated to purity of Bharatanatyam and youth mentorship.",
+        "history": "Bharatanatyam originated in the temples of Tamil Nadu and is detailed in Bharata Muni's Natya Shastra.",
+        "img": "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=800&q=80",
+        "allowOfflinePay": False,
+        "mapX": 0.75,
+        "mapY": 0.65,
+        "isSeatedShow": True,
+    },
+    {
+        "id": "CUST-104",
+        "artistName": "Sacred Fire Heritage Trust",
+        "category": "Rituals",
+        "location": "Bengaluru - Malleshwaram",
+        "title": "Vedic Chanting & Sacred Ritual Experience",
+        "language": "Sanskrit",
+        "genre": "Sacred Ritual & Chanting",
+        "baseCost": 400,
+        "createdBy": "Veda Pathashala Scholars",
+        "aboutExp": "Participate in an immersive traditional Vedic chanting session with symbolic floral offerings and peaceful ambient acoustics.",
+        "aboutArtist": "Hereditary scholars trained in pristine oral recitation techniques passed down through generations.",
+        "history": "UNESCO recognized Vedic chanting as an intangible heritage of humanity due to its exact tonal conservation.",
+        "img": "https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80",
+        "allowOfflinePay": True,
+        "mapX": 0.35,
+        "mapY": 0.70,
+        "isSeatedShow": False,
+    },
+    {
+        "id": "CUST-105",
+        "artistName": "Malleshwaram Heritage Walkers",
+        "category": "Heritage Experiences",
+        "location": "Bengaluru - Malleshwaram",
+        "title": "Old Bangalore Temple & Silk Weaver Trail",
+        "language": "English & Kannada",
+        "genre": "Architectural & Cultural Walking Tour",
+        "baseCost": 850,
+        "endProduct": "Handcrafted Brass Bookmark & Traditional Filter Coffee",
+        "orator": "Historian Suresh Jayaram",
+        "placeDesc": "Explore 17th-century Kadu Malleshwara temple, ancient stepwells, and traditional silk marketplace alleys.",
+        "img": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=800&q=80",
+        "allowOfflinePay": True,
+        "mapX": 0.45,
+        "mapY": 0.45,
+        "isSeatedShow": False,
+    },
+    {
+        "id": "CUST-106",
+        "artistName": "Royal Mysore Wood & Craft Studio",
+        "category": "Handicrafts",
+        "craftSubcategory": "Furniture",
+        "location": "Bengaluru - Malleshwaram",
+        "title": "Hand-Carved Rosewood & Inlay Coffee Table",
+        "baseCost": 8500,
+        "shopAddr": "Studio #22, Sampige Road, Malleshwaram",
+        "dimensions": "4ft x 2.5ft x 1.8ft",
+        "aboutExp": "Elegantly carved solid wood table featuring floral brass inlay crafted by master wood artisans.",
+        "img": "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=800&q=80",
+        "allowOfflinePay": True,
+        "mapX": 0.82,
+        "mapY": 0.30,
+        "isSeatedShow": False,
+    },
+    {
+        "id": "CUST-107",
+        "artistName": "Channapatna Craft Collective",
+        "category": "Handicrafts",
+        "craftSubcategory": "Home Decor",
+        "location": "Bengaluru - Malleshwaram",
+        "title": "Eco-Friendly Lacquerware Wooden Lamp",
+        "baseCost": 2200,
+        "shopAddr": "Craft Shed #5, Margosa Road",
+        "dimensions": "1.5ft x 1.5ft x 2.5ft",
+        "aboutExp": "Non-toxic vegetable dyed wooden table lamp turned on traditional lathes.",
+        "img": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80",
+        "allowOfflinePay": True,
+        "mapX": 0.18,
+        "mapY": 0.55,
+        "isSeatedShow": False,
+    },
+    {
+        "id": "CUST-108",
+        "artistName": "Tanjore Gold Leaf Atelier",
+        "category": "Handicrafts",
+        "craftSubcategory": "Paintings",
+        "location": "Bengaluru - Malleshwaram",
+        "title": "Sacred Ganesha Tanjore Painting with Gold Foil",
+        "baseCost": 12500,
+        "shopAddr": "Gallery 8, 8th Main Malleshwaram",
+        "dimensions": "2.5ft x 3ft",
+        "aboutExp": "Authentic Tanjore artwork studded with semi-precious Jaipur gems and 22k gold leaf foil.",
+        "img": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+        "allowOfflinePay": True,
+        "mapX": 0.50,
+        "mapY": 0.80,
+        "isSeatedShow": False,
+    },
+]
+
+
+def init_state() -> None:
+    if "listings" not in st.session_state:
+        st.session_state.listings = deepcopy(BASE_LISTINGS)
+    if "user_name" not in st.session_state:
+        st.session_state.user_name = "Guest"
+    if "user_role" not in st.session_state:
+        st.session_state.user_role = "Viewer"
+    if "selected_listing_id" not in st.session_state:
+        st.session_state.selected_listing_id = None
+    if "selected_seats" not in st.session_state:
+        st.session_state.selected_seats = []
+    if "receipt" not in st.session_state:
+        st.session_state.receipt = None
+
+
+def listing_color(category: str) -> str:
+    return CATEGORY_COLORS.get(category, "#c85a32")
+
+
+def rupees(amount: float) -> str:
+    return f"₹{amount:,.2f}"
+
+
+def get_filtered_listings(area: str, category: str, subcategory: str, query: str):
+    filtered = []
+    for item in st.session_state.listings:
+        matches_area = item.get("location") == area
+        matches_cat = category == "All" or item.get("category") == category
+        matches_sub = (
+            category != "Handicrafts"
+            or subcategory == "All"
+            or item.get("craftSubcategory") == subcategory
+        )
+        text_blob = " ".join(
+            [
+                str(item.get("artistName", "")),
+                str(item.get("title", "")),
+                str(item.get("aboutExp", "")),
+                str(item.get("history", "")),
+                str(item.get("placeDesc", "")),
+                str(item.get("craftSubcategory", "")),
+            ]
+        ).lower()
+        matches_query = query.lower() in text_blob
+        if matches_area and matches_cat and matches_sub and matches_query:
+            filtered.append(item)
+
+    if not filtered:
+        fallback = []
+        for item in st.session_state.listings:
+            if category == "All" or item.get("category") == category:
+                text_blob = " ".join(
+                    [
+                        str(item.get("artistName", "")),
+                        str(item.get("title", "")),
+                        str(item.get("aboutExp", "")),
+                        str(item.get("history", "")),
+                        str(item.get("placeDesc", "")),
+                        str(item.get("craftSubcategory", "")),
+                    ]
+                ).lower()
+                if query.lower() in text_blob:
+                    fallback.append(item)
+        return fallback
+
+    return filtered
+
+
+def build_map_dataframe(listings: list[dict], selected_area: str) -> pd.DataFrame:
+    base_lat, base_lon = AREA_CENTERS[selected_area]
+    rows = []
+    for item in listings:
+        map_x = float(item.get("mapX", 0.5))
+        map_y = float(item.get("mapY", 0.5))
+        rows.append(
+            {
+                "lat": base_lat + ((map_y - 0.5) * 0.06),
+                "lon": base_lon + ((map_x - 0.5) * 0.06),
+                "name": item.get("artistName"),
+                "category": item.get("category"),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def render_sidebar() -> None:
+    st.sidebar.title("Account & Custodian Portal")
+    role = st.sidebar.radio("Role", ["Viewer", "Custodian"], horizontal=True)
+    name = st.sidebar.text_input("Full Name", value=st.session_state.user_name)
+
+    if st.sidebar.button("Login / Update Profile", use_container_width=True):
+        st.session_state.user_name = name.strip() or "Guest"
+        st.session_state.user_role = role
+        st.sidebar.success(f"Logged in as {st.session_state.user_name} ({role})")
+
+    st.sidebar.markdown("---")
+    st.sidebar.caption(
+        "As a custodian, publish one or more category listings and set payment preferences."
+    )
+
+    with st.sidebar.form("custodian_form"):
+        categories = st.multiselect(
+            "Select Practice Categories",
+            [
+                "Dramatics",
+                "Music",
+                "Dance",
+                "Rituals",
+                "Heritage Experiences",
+                "Handicrafts",
+            ],
+        )
+
+        artist_name = st.text_input("Artist / Troupe Name", value="")
+        location = st.selectbox("Local Area Location", AREAS)
+
+        show_performing = any(
+            c in categories for c in ["Dramatics", "Music", "Dance", "Rituals"]
+        )
+        show_heritage = "Heritage Experiences" in categories
+        show_craft = "Handicrafts" in categories
+
+        perf_lang = perf_genre = perf_created_by = perf_img = ""
+        perf_about = perf_artist = perf_history = ""
+        perf_cost = 500.0
+
+        if show_performing:
+            st.markdown("Performing Arts & Rituals Details")
+            perf_lang = st.text_input("Language", value="")
+            perf_genre = st.text_input("Genre", value="")
+            perf_cost = st.number_input("Base Cost (₹)", min_value=100.0, value=500.0)
+            perf_created_by = st.text_input("Created By / Troupe Leader", value="")
+            perf_img = st.text_input("Image URL", value="")
+            perf_about = st.text_area("About the Experience", value="")
+            perf_artist = st.text_area("About the Artist", value="")
+            perf_history = st.text_area("History of the Performance", value="")
+
+        herit_lang = herit_genre = herit_end = herit_orator = herit_desc = ""
+        herit_cost = 750.0
+
+        if show_heritage:
+            st.markdown("Heritage Experience Details")
+            herit_lang = st.text_input("Heritage Language", value="")
+            herit_genre = st.text_input("Genre / Walk Type", value="")
+            herit_cost = st.number_input(
+                "Heritage Base Cost (₹)", min_value=100.0, value=750.0
+            )
+            herit_end = st.text_input("End Product / Takeaway", value="")
+            herit_orator = st.text_input("About the Orator / Guide", value="")
+            herit_desc = st.text_area("General Description of the Place", value="")
+
+        craft_sub = "Furniture"
+        craft_title = craft_dims = craft_addr = ""
+        craft_cost = 2500.0
+
+        if show_craft:
+            st.markdown("Handicraft Product Details")
+            craft_sub = st.selectbox("Subcategory", CRAFT_SUBCATEGORIES)
+            craft_title = st.text_input("Product Title", value="")
+            craft_cost = st.number_input(
+                "Base Price (₹)", min_value=100.0, value=2500.0
+            )
+            craft_dims = st.text_input("Dimensions", value="")
+            craft_addr = st.text_input("Shop / Studio Address", value="")
+
+        allow_offline = st.checkbox(
+            "Allow Direct Offline / Cash Payment at Venue?", value=True
+        )
+
+        submit_listing = st.form_submit_button(
+            "Publish Cultural Listing to Local Area", use_container_width=True
+        )
+
+    if submit_listing:
+        if not categories:
+            st.sidebar.error("Please select at least one practice category.")
+            return
+        if not artist_name.strip():
+            st.sidebar.error("Artist / troupe name is required.")
+            return
+
+        for cat in categories:
+            new_listing = {
+                "id": f"CUST-{random.randint(200, 999)}",
+                "artistName": artist_name,
+                "category": cat,
+                "location": location,
+                "allowOfflinePay": allow_offline,
+                "mapX": round(random.uniform(0.2, 0.8), 3),
+                "mapY": round(random.uniform(0.2, 0.8), 3),
+                "baseCost": 500,
+                "title": f"{artist_name} {cat} Showcase",
+                "img": "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=800&q=80",
+                "isSeatedShow": False,
+            }
+
+            if cat in ["Dramatics", "Music", "Dance", "Rituals"]:
+                new_listing["language"] = perf_lang or "Kannada"
+                new_listing["genre"] = perf_genre or "Classical Art"
+                new_listing["baseCost"] = float(perf_cost)
+                new_listing["createdBy"] = perf_created_by or artist_name
+                new_listing["aboutExp"] = perf_about or "Live performance."
+                new_listing["aboutArtist"] = perf_artist or "Master practitioner."
+                new_listing["history"] = perf_history or "Traditional history."
+                new_listing["isSeatedShow"] = True
+                if perf_img.strip():
+                    new_listing["img"] = perf_img.strip()
+
+            elif cat == "Heritage Experiences":
+                new_listing["language"] = herit_lang or "English"
+                new_listing["genre"] = herit_genre or "Heritage Trail"
+                new_listing["baseCost"] = float(herit_cost)
+                new_listing["endProduct"] = herit_end or "Craft Souvenir"
+                new_listing["orator"] = herit_orator or artist_name
+                new_listing["placeDesc"] = herit_desc or "Historical landmark."
+
+            elif cat == "Handicrafts":
+                new_listing["craftSubcategory"] = craft_sub
+                new_listing["title"] = craft_title or "Handcrafted Treasure"
+                new_listing["baseCost"] = float(craft_cost)
+                new_listing["dimensions"] = craft_dims or "2ft x 2ft"
+                new_listing["shopAddr"] = craft_addr or "Local Craft Market"
+                new_listing["aboutExp"] = f"Handcrafted with sustainable material by {artist_name}"
+
+            st.session_state.listings.insert(0, new_listing)
+
+        st.sidebar.success(f"Success! Listings published in {location}")
+
+
+def render_listing_grid(listings: list[dict]) -> None:
+    cols = st.columns(3)
+    for idx, item in enumerate(listings):
+        with cols[idx % 3]:
+            st.image(item.get("img"), use_container_width=True)
+            cat = item.get("category")
+            subcat = item.get("craftSubcategory")
+            label = f"{cat}"
+            if subcat:
+                label = f"{label} • {subcat}"
+
+            badge = f"<span style='background:{listing_color(cat)};color:#fff;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:600;'>{label}</span>"
+            st.markdown(badge, unsafe_allow_html=True)
+            st.markdown(f"### {item.get('title')}")
+            st.caption(item.get("artistName"))
+            st.write(item.get("aboutExp") or item.get("placeDesc") or item.get("history"))
+            customer_price = item.get("baseCost", 0) * 1.02
+            st.markdown(f"**Customer Price (incl. 2% fee): {rupees(customer_price)}**")
+            if st.button("Explore & Book", key=f"book_{item.get('id')}", use_container_width=True):
+                st.session_state.selected_listing_id = item.get("id")
+                st.session_state.selected_seats = []
+
+
+def render_detail_and_checkout(selected_item: dict) -> None:
+    st.markdown("---")
+    st.subheader("Listing Details")
+    st.image(selected_item.get("img"), use_container_width=True)
+
+    st.markdown(
+        f"<span style='background:{listing_color(selected_item.get('category'))};color:#fff;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;'>{selected_item.get('category')}</span>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(f"## {selected_item.get('title')}")
+    st.caption(f"Custodian: {selected_item.get('artistName')} | Location: {selected_item.get('location')}")
+
+    category = selected_item.get("category")
+
+    if category in ["Dramatics", "Music", "Dance", "Rituals"]:
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Language", selected_item.get("language", "-"))
+        c2.metric("Genre", selected_item.get("genre", "-"))
+        c3.metric("Created By", selected_item.get("createdBy", "-"))
+        st.write(f"**About the Experience:** {selected_item.get('aboutExp', '-')}")
+        st.write(f"**About the Artist:** {selected_item.get('aboutArtist', '-')}")
+        st.write(f"**History:** {selected_item.get('history', '-')}")
+
+        if selected_item.get("isSeatedShow", False):
+            st.markdown("### Pick Your Show Seats")
+            all_seats = [f"{r}{n}" for r in ["A", "B", "C", "D"] for n in range(1, 9)]
+            reserved = {"A3", "A4"}
+            available = [seat for seat in all_seats if seat not in reserved]
+            selected = st.multiselect(
+                "Available seats",
+                options=available,
+                default=st.session_state.selected_seats,
+                help="Reserved seats: A3, A4",
+            )
+            st.session_state.selected_seats = selected
+
+    elif category == "Heritage Experiences":
+        c1, c2 = st.columns(2)
+        c1.metric("Language", selected_item.get("language", "-"))
+        c2.metric("Genre", selected_item.get("genre", "-"))
+        st.write(f"**Orator / Guide:** {selected_item.get('orator', '-')}")
+        st.write(f"**Takeaway Product:** {selected_item.get('endProduct', '-')}")
+        st.write(f"**Place Description & History:** {selected_item.get('placeDesc', '-')}")
+
+    elif category == "Handicrafts":
+        c1, c2 = st.columns(2)
+        c1.metric("Subcategory", selected_item.get("craftSubcategory", "-"))
+        c2.metric("Dimensions", selected_item.get("dimensions", "-"))
+        st.write(f"**Shop / Studio Address:** {selected_item.get('shopAddr', '-')}")
+        st.write(f"**Craft Details:** {selected_item.get('aboutExp', '-')}")
+
+        if selected_item.get("craftSubcategory") in ["Furniture", "Paintings", "Home Decor"]:
+            st.markdown("### Room Fit Checker")
+            cw1, cw2 = st.columns(2)
+            spot_w = cw1.number_input("Spot Width (ft)", min_value=0.5, value=5.0, step=0.5)
+            spot_d = cw2.number_input("Spot Depth (ft)", min_value=0.5, value=3.0, step=0.5)
+            if spot_w >= 4 and spot_d >= 2:
+                st.success(f"Perfect Fit! Your spot ({spot_w}ft x {spot_d}ft) accommodates this item.")
+            else:
+                st.warning("Tight Fit: Recommended minimum is 4ft x 2ft.")
+
+    st.markdown("### Checkout")
+
+    seat_count = len(st.session_state.selected_seats)
+    units = seat_count if seat_count > 0 else 1
+    base_total = float(selected_item.get("baseCost", 0)) * units
+    platform_fee = base_total * 0.02
+    total = base_total + platform_fee
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Base Price", rupees(base_total))
+    c2.metric("Platform Fee (2%)", rupees(platform_fee))
+    c3.metric("Total", rupees(total))
+
+    if seat_count > 0:
+        st.info(f"Selected Seats: {', '.join(st.session_state.selected_seats)}")
+
+    with st.form("checkout_form"):
+        pay_options = ["Online Gateway (UPI / Cards / Net Banking)"]
+        if selected_item.get("allowOfflinePay", False):
+            pay_options.append("Direct Offline Payment at Venue / Shop")
+
+        pay_method = st.radio("Select Payment Method", pay_options)
+        user_email = st.text_input("Email for Booking Ticket & Receipt Dispatch")
+        confirm = st.form_submit_button("Confirm & Issue Ticket / Receipt", use_container_width=True)
+
+    if confirm:
+        if not user_email.strip():
+            st.error("Email is required for booking confirmation.")
+            return
+
+        st.session_state.receipt = {
+            "booking_id": f"KS-{random.randint(100000, 999999)}",
+            "item_name": selected_item.get("title"),
+            "custodian": selected_item.get("artistName"),
+            "location": selected_item.get("location"),
+            "email": user_email.strip(),
+            "pay_method": pay_method,
+            "seats": list(st.session_state.selected_seats),
+            "total": total,
+        }
+        st.success("Booking confirmed. Receipt generated below.")
+
+    if st.session_state.receipt:
+        rec = st.session_state.receipt
+        st.markdown("---")
+        st.subheader("KalaSutra Ticket")
+        st.write(f"**Booking ID:** #{rec['booking_id']}")
+        st.write(f"**Item / Show:** {rec['item_name']}")
+        st.write(f"**Custodian:** {rec['custodian']}")
+        st.write(f"**Location:** {rec['location']}")
+        st.write(f"**Customer Email:** {rec['email']}")
+        if rec["seats"]:
+            st.write(f"**Reserved Seats:** {', '.join(rec['seats'])}")
+        st.write(f"**Payment Method:** {rec['pay_method']}")
+        st.write(f"**Total Paid (inc. 2% fee):** {rupees(rec['total'])}")
+        st.success("Email receipt dispatched (simulated).")
+
+
+def main() -> None:
+    init_state()
+
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background: linear-gradient(180deg, #fdfbf7 0%, #fff7ed 100%);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    render_sidebar()
+
+    st.title("KalaSutra")
+    st.caption("Heritage & Artisans Hub")
+
+    top1, top2, top3 = st.columns([2, 2, 2])
+    with top1:
+        selected_area = st.selectbox("Region", AREAS)
+    with top2:
+        selected_category = st.selectbox(
+            "Category",
+            [
+                "All",
+                "Dramatics",
+                "Music",
+                "Dance",
+                "Rituals",
+                "Heritage Experiences",
+                "Handicrafts",
+            ],
+        )
+    with top3:
+        search_query = st.text_input("Search artists, crafts, traditions", value="")
+
+    selected_subcategory = "All"
+    if selected_category == "Handicrafts":
+        selected_subcategory = st.radio(
+            "Filter Craft",
+            ["All"] + CRAFT_SUBCATEGORIES,
+            horizontal=True,
+        )
+
+    filtered = get_filtered_listings(
+        selected_area, selected_category, selected_subcategory, search_query
+    )
+
+    st.subheader("Local Artisans & Custodians Map")
+    st.caption(f"Current area: {selected_area}")
+
+    if filtered:
+        map_df = build_map_dataframe(filtered, selected_area)
+        st.map(map_df, zoom=11, use_container_width=True)
+    else:
+        st.info("No map points available for the current filters.")
+
+    st.markdown("---")
+    st.subheader("Featured Cultural Experiences & Crafts")
+    st.caption(f"Showing {len(filtered)} listings")
+
+    if filtered:
+        render_listing_grid(filtered)
+    else:
+        st.warning("No listings matched. Try broadening your filters.")
+
+    if st.session_state.selected_listing_id:
+        selected_item = next(
+            (
+                listing
+                for listing in st.session_state.listings
+                if listing.get("id") == st.session_state.selected_listing_id
+            ),
+            None,
+        )
+        if selected_item:
+            render_detail_and_checkout(selected_item)
+
+    st.markdown("---")
+    st.caption(
+        "Transparent 2% Customer Surcharge • Verified Local Masters • Direct Venue Payments"
+    )
+
+
+if __name__ == "__main__":
+    main()
