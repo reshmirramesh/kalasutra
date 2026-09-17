@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KalaSutra - Local Cultural & Artisan Platform</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          colors: {
+            dramatics: '#e63946',
+            music: '#1d3557',
+            dance: '#2a9d8f',
+            rituals: '#7209b7',
+            heritage: '#e9c46a',
+            handicrafts: '#f4a261',
+            brandDark: '#1a0e0a',
+            brandCream: '#fdfbf7',
+            brandTerracotta: '#c85a32',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar & Utility Animations */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #c85a32; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a04220; }
+    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    .category-badge-dramatics { background-color: #e63946; color: #fff; }
+    .category-badge-music { background-color: #1d3557; color: #fff; }
+    .category-badge-dance { background-color: #2a9d8f; color: #fff; }
+    .category-badge-rituals { background-color: #7209b7; color: #fff; }
+    .category-badge-heritage { background-color: #e9c46a; color: #1a0e0a; }
+    .category-badge-handicrafts { background-color: #f4a261; color: #1a0e0a; }
+  </style>
+</head>
+<body class="bg-brandCream text-gray-800 font-sans min-h-screen flex flex-col">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-orange-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="resetToHome()">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-brandTerracotta to-amber-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
+          <i class="fa-solid me-0.5 fa-om"></i>
+        </div>
+        <div>
+          <span class="font-serif text-2xl font-bold tracking-tight text-brandDark block leading-none">KalaSutra</span>
+          <span class="text-xs text-amber-800 font-medium tracking-wide">Heritage & Artisans Hub</span>
+        </div>
+      </div>
+
+      <!-- Area Location Selector -->
+      <div class="flex items-center bg-orange-50 border border-orange-200/80 rounded-full px-4 py-1.5 shadow-inner">
+        <i class="fa-solid fa-location-dot text-brandTerracotta mr-2 text-sm"></i>
+        <span class="text-xs font-semibold text-gray-500 mr-2 uppercase tracking-wider hidden sm:inline">Region:</span>
+        <select id="locationSelect" onchange="handleLocationChange(this.value)" class="bg-transparent font-medium text-sm text-brandDark focus:outline-none cursor-pointer">
+          <option value="Bengaluru - Malleshwaram" selected>Bengaluru - Malleshwaram</option>
+          <option value="Bengaluru - Indiranagar">Bengaluru - Indiranagar</option>
+          <option value="Bengaluru - Jayanagar">Bengaluru - Jayanagar</option>
+          <option value="Mysuru - Cultural Zone">Mysuru - Cultural Zone</option>
+          <option value="Hampi - Heritage Quarter">Hampi - Heritage Quarter</option>
+          <option value="Jaipur - Pink City Arts">Jaipur - Pink City Arts</option>
+        </select>
+      </div>
+
+      <!-- Action & Auth Controls -->
+      <div class="flex items-center space-x-3">
+        <!-- Quick Role Selector / User Status Indicator -->
+        <div id="userStatusBadge" class="hidden md:flex items-center bg-gray-100 text-gray-700 rounded-lg px-3 py-1.5 text-xs font-medium">
+          <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+          <span id="roleText">Viewer Mode</span>
+        </div>
+
+        <button id="custodianPortalBtn" onclick="openCustodianModal()" class="hidden sm:flex items-center space-x-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-semibold text-xs px-3.5 py-2 rounded-lg transition shadow-sm">
+          <i class="fa-solid fa-store text-amber-700"></i>
+          <span>Custodian Dashboard</span>
+        </button>
+
+        <button id="authBtn" onclick="openAuthModal()" class="bg-brandTerracotta hover:bg-orange-700 text-white font-medium text-xs sm:text-sm px-4 py-2 rounded-lg transition shadow-sm flex items-center space-x-2">
+          <i class="fa-solid fa-user-circle"></i>
+          <span id="authBtnText">Login / Sign Up</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <!-- Interactive Canvas/SVG Map Banner -->
+    <section class="bg-white rounded-2xl p-4 sm:p-6 border border-orange-100 shadow-sm relative overflow-hidden">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-3 border-b border-gray-100 gap-4">
+        <div>
+          <h1 class="font-serif text-2xl sm:text-3xl font-bold text-brandDark flex items-center gap-2">
+            Local Artisans & Custodians Map
+            <span id="currentAreaDisplay" class="text-xs font-sans font-normal px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full border border-amber-200">Bengaluru - Malleshwaram</span>
+          </h1>
+          <p class="text-xs sm:text-sm text-gray-500 mt-1">Explore authentic masters, live performances, and handcrafted arts near you in real-time.</p>
+        </div>
+
+        <!-- Color Code Category Legend -->
+        <div class="flex flex-wrap gap-2 text-xs font-medium">
+          <span class="px-2.5 py-1 rounded-md text-white bg-dramatics shadow-xs"><i class="fa-solid fa-masks-theater mr-1"></i>Dramatics</span>
+          <span class="px-2.5 py-1 rounded-md text-white bg-music shadow-xs"><i class="fa-solid fa-music mr-1"></i>Music</span>
+          <span class="px-2.5 py-1 rounded-md text-white bg-dance shadow-xs"><i class="fa-solid fa-person-dots-from-line mr-1"></i>Dance</span>
+          <span class="px-2.5 py-1 rounded-md text-white bg-rituals shadow-xs"><i class="fa-solid fa-fire-flame-curved mr-1"></i>Rituals</span>
+          <span class="px-2.5 py-1 rounded-md text-brandDark bg-heritage shadow-xs"><i class="fa-solid fa-landmark mr-1"></i>Heritage</span>
+          <span class="px-2.5 py-1 rounded-md text-brandDark bg-handicrafts shadow-xs"><i class="fa-solid fa-jar mr-1"></i>Handicrafts</span>
+        </div>
+      </div>
+
+      <!-- Interactive Canvas Map Container -->
+      <div class="relative w-full h-80 sm:h-96 rounded-xl overflow-hidden border border-gray-200 bg-amber-50/40">
+        <canvas id="interactiveMapCanvas" class="w-full h-full cursor-crosshair block"></canvas>
+        
+        <!-- Map Tooltip Overlay -->
+        <div id="mapTooltip" class="absolute hidden bg-white/95 text-xs text-gray-800 p-3 rounded-lg shadow-xl border border-gray-200 max-w-xs z-30 pointer-events-none transition-all duration-150">
+          <p id="tooltipTitle" class="font-bold font-serif text-sm text-brandDark"></p>
+          <p id="tooltipCategory" class="text-xs font-semibold my-0.5"></p>
+          <p id="tooltipDesc" class="text-gray-600 truncate"></p>
+        </div>
+
+        <!-- Map Controls -->
+        <div class="absolute bottom-3 right-3 flex flex-col space-y-1 z-20">
+          <button onclick="resetMapZoom()" class="bg-white/90 hover:bg-white text-gray-700 p-2 rounded-md shadow border border-gray-200 text-xs font-bold transition">
+            <i class="fa-solid fa-arrows-to-dot mr-1"></i> Reset View
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Filter Bar for Categories -->
+    <section class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <!-- Category Filter Tabs -->
+        <div class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto pb-2 scrollbar-none" id="categoryTabs">
+          <button onclick="filterCategory('All')" class="cat-tab-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-brandDark text-white shadow">
+            All Categories
+          </button>
+          <button onclick="filterCategory('Dramatics')" class="cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-orange-50">
+            <i class="fa-solid fa-masks-theater text-dramatics mr-1.5"></i>Dramatics
+          </button>
+          <button onclick="filterCategory('Music')" class="cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-orange-50">
+            <i class="fa-solid fa-music text-music mr-1.5"></i>Music
+          </button>
+          <button onclick="filterCategory('Dance')" class="cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-orange-50">
+            <i class="fa-solid fa-person-dots-from-line text-dance mr-1.5"></i>Dance
+          </button>
+          <button onclick="filterCategory('Rituals')" class="cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-orange-50">
+            <i class="fa-solid fa-fire-flame-curved text-rituals mr-1.5"></i>Rituals
+          </button>
+          <button onclick="filterCategory('Heritage Experiences')" class="cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-orange-50">
+            <i class="fa-solid fa-landmark text-amber-600 mr-1.5"></i>Heritage
+          </button>
+          <button onclick="filterCategory('Handicrafts')" class="cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-orange-50">
+            <i class="fa-solid fa-jar text-handicrafts mr-1.5"></i>Handicrafts
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative min-w-[240px]">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+          <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search artists, crafts, traditions..." class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brandTerracotta">
+        </div>
+      </div>
+
+      <!-- Handicraft Subcategory Bar (Dynamic) -->
+      <div id="handicraftSubBar" class="hidden flex items-center space-x-2 bg-orange-50/80 p-2 rounded-xl border border-orange-200 overflow-x-auto text-xs">
+        <span class="font-bold text-gray-600 mr-2 uppercase tracking-wider text-[10px]">Filter Craft:</span>
+        <button onclick="filterHandicraftSub('All')" class="craft-sub-btn bg-brandTerracotta text-white px-3 py-1 rounded-md font-medium">All Crafts</button>
+        <button onclick="filterHandicraftSub('Jewellery')" class="craft-sub-btn bg-white border text-gray-700 px-3 py-1 rounded-md hover:bg-orange-100">Jewellery</button>
+        <button onclick="filterHandicraftSub('Bags')" class="craft-sub-btn bg-white border text-gray-700 px-3 py-1 rounded-md hover:bg-orange-100">Bags</button>
+        <button onclick="filterHandicraftSub('Clothes')" class="craft-sub-btn bg-white border text-gray-700 px-3 py-1 rounded-md hover:bg-orange-100">Clothes</button>
+        <button onclick="filterHandicraftSub('Home Decor')" class="craft-sub-btn bg-white border text-gray-700 px-3 py-1 rounded-md hover:bg-orange-100">Home Decor</button>
+        <button onclick="filterHandicraftSub('Footwear')" class="craft-sub-btn bg-white border text-gray-700 px-3 py-1 rounded-md hover:bg-orange-100">Footwear</button>
+        <button onclick="filterHandicraftSub('Paintings')" class="craft-sub-btn bg-white border text-gray-700 px-3 py-1 rounded-md hover:bg-orange-100">Paintings</button>
+        <button onclick="filterHandicraftSub('Furniture')" class="craft-sub-btn bg-white border text-gray-700 px-3 py-1 rounded-md hover:bg-orange-100">Furniture</button>
+      </div>
+    </section>
+
+    <!-- Main Listings Grid -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 id="gridTitle" class="font-serif text-xl sm:text-2xl font-bold text-brandDark">Featured Cultural Experiences & Crafts</h2>
+        <span id="resultsCount" class="text-xs font-semibold text-gray-500 bg-gray-200/80 px-2.5 py-1 rounded-full">Showing 6 listings</span>
+      </div>
+
+      <div id="listingsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Dynamic Cards rendered via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-brandDark text-orange-100 border-t border-orange-950 mt-12 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between text-xs space-y-4 md:space-y-0">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-brandTerracotta text-white flex items-center justify-center font-bold">
+          <i class="fa-solid fa-om"></i>
+        </div>
+        <div>
+          <p class="font-serif font-bold text-sm text-white">KalaSutra Platform</p>
+          <p class="text-gray-400">Preserving living traditions & empowering local custodians.</p>
+        </div>
+      </div>
+      <div class="flex space-x-6 text-gray-400">
+        <span>Transparent 2% Customer Surcharge</span>
+        <span>•</span>
+        <span>Verified Local Masters</span>
+        <span>•</span>
+        <span>Direct Venue Payments</span>
+      </div>
+      <p class="text-gray-500">© 2026 KalaSutra Cultural Technologies. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- MODAL 1: Login / Sign Up Modal with Explicit Role Selection -->
+  <div id="authModal" class="fixed inset-0 bg-brandDark/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-orange-100">
+      <button onclick="closeModal('authModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-full bg-orange-100 text-brandTerracotta flex items-center justify-center mx-auto text-xl mb-2 font-serif font-bold">
+          <i class="fa-solid fa-user-gear"></i>
+        </div>
+        <h3 class="font-serif text-2xl font-bold text-brandDark">Welcome to KalaSutra</h3>
+        <p class="text-xs text-gray-500 mt-1">Select your account role to continue</p>
+      </div>
+
+      <!-- Role Selection Switcher -->
+      <div class="grid grid-cols-2 gap-3 mb-6 p-1 bg-gray-100 rounded-xl">
+        <button id="roleBtnViewer" onclick="selectAuthRole('Viewer')" class="py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2 bg-white text-brandDark shadow">
+          <i class="fa-solid fa-eye text-amber-600"></i>
+          <span>Viewer / Customer</span>
+        </button>
+        <button id="roleBtnCustodian" onclick="selectAuthRole('Custodian')" class="py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2 text-gray-600 hover:text-brandDark">
+          <i class="fa-solid fa-store text-brandTerracotta"></i>
+          <span>Artisan Custodian</span>
+        </button>
+      </div>
+
+      <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Full Name</label>
+          <input type="text" id="authName" required placeholder="e.g. Ramesh Varma" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:border-brandTerracotta">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Email Address</label>
+          <input type="email" id="authEmail" required placeholder="ramesh@example.com" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:border-brandTerracotta">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Phone Number</label>
+          <input type="tel" id="authPhone" required placeholder="+91 98765 43210" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:border-brandTerracotta">
+        </div>
+
+        <div id="custodianQuickNote" class="hidden bg-orange-50 border border-orange-200 p-3 rounded-lg text-[11px] text-amber-900">
+          <i class="fa-solid fa-info-circle mr-1 text-brandTerracotta"></i>
+          As an Artisan Custodian, you can register multi-practice listings, manage bank details, and toggle offline payments.
+        </div>
+
+        <button type="submit" class="w-full bg-brandTerracotta hover:bg-orange-700 text-white font-bold py-2.5 rounded-lg text-xs sm:text-sm transition shadow-md">
+          Continue as <span id="authSubmitRoleText">Viewer / Customer</span>
+        </button>
+      </form>
+
+      <p class="text-[11px] text-gray-400 text-center mt-4">
+        * Regardless of role selected, you will be able to explore all cultural listings on the main page.
+      </p>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Custodian Listing Registration & Dashboard Modal -->
+  <div id="custodianModal" class="fixed inset-0 bg-brandDark/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl relative border border-orange-100">
+      <button onclick="closeModal('custodianModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="border-b border-gray-100 pb-4 mb-4">
+        <div class="flex items-center space-x-2 text-brandTerracotta text-xs font-bold uppercase tracking-wider">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>Custodian Onboarding & Listing Portal</span>
+        </div>
+        <h3 class="font-serif text-2xl font-bold text-brandDark mt-1">Register Your Cultural Practice & Crafts</h3>
+        <p class="text-xs text-gray-500">Provide details for your offerings. You can select multiple practice categories.</p>
+      </div>
+
+      <form onsubmit="handleCustodianSubmit(event)" class="space-y-6">
+        <!-- 1. Category Selection Checkboxes -->
+        <div>
+          <label class="block text-xs font-bold text-gray-800 uppercase tracking-wide mb-2">1. Select Your Practice Categories</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-semibold">
+            <label class="flex items-center p-2.5 border rounded-lg cursor-pointer hover:bg-orange-50 has-[:checked]:bg-orange-100 has-[:checked]:border-brandTerracotta">
+              <input type="checkbox" value="Dramatics" onchange="toggleCategoryFormFields()" class="custodian-cat-check mr-2 accent-brandTerracotta"> Dramatics
+            </label>
+            <label class="flex items-center p-2.5 border rounded-lg cursor-pointer hover:bg-orange-50 has-[:checked]:bg-orange-100 has-[:checked]:border-brandTerracotta">
+              <input type="checkbox" value="Music" onchange="toggleCategoryFormFields()" class="custodian-cat-check mr-2 accent-brandTerracotta"> Music
+            </label>
+            <label class="flex items-center p-2.5 border rounded-lg cursor-pointer hover:bg-orange-50 has-[:checked]:bg-orange-100 has-[:checked]:border-brandTerracotta">
+              <input type="checkbox" value="Dance" onchange="toggleCategoryFormFields()" class="custodian-cat-check mr-2 accent-brandTerracotta"> Dance
+            </label>
+            <label class="flex items-center p-2.5 border rounded-lg cursor-pointer hover:bg-orange-50 has-[:checked]:bg-orange-100 has-[:checked]:border-brandTerracotta">
+              <input type="checkbox" value="Rituals" onchange="toggleCategoryFormFields()" class="custodian-cat-check mr-2 accent-brandTerracotta"> Rituals
+            </label>
+            <label class="flex items-center p-2.5 border rounded-lg cursor-pointer hover:bg-orange-50 has-[:checked]:bg-orange-100 has-[:checked]:border-brandTerracotta">
+              <input type="checkbox" value="Heritage Experiences" onchange="toggleCategoryFormFields()" class="custodian-cat-check mr-2 accent-brandTerracotta"> Heritage
+            </label>
+            <label class="flex items-center p-2.5 border rounded-lg cursor-pointer hover:bg-orange-50 has-[:checked]:bg-orange-100 has-[:checked]:border-brandTerracotta">
+              <input type="checkbox" value="Handicrafts" onchange="toggleCategoryFormFields()" class="custodian-cat-check mr-2 accent-brandTerracotta"> Handicrafts
+            </label>
+          </div>
+        </div>
+
+        <!-- Common Details -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Artist / Troupe Name</label>
+            <input type="text" id="custodianArtistName" required placeholder="e.g. Master Shankara Ensemble" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:border-brandTerracotta">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Local Area Location</label>
+            <select id="custodianLocation" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:border-brandTerracotta">
+              <option value="Bengaluru - Malleshwaram">Bengaluru - Malleshwaram</option>
+              <option value="Bengaluru - Indiranagar">Bengaluru - Indiranagar</option>
+              <option value="Bengaluru - Jayanagar">Bengaluru - Jayanagar</option>
+              <option value="Mysuru - Cultural Zone">Mysuru - Cultural Zone</option>
+              <option value="Hampi - Heritage Quarter">Hampi - Heritage Quarter</option>
+              <option value="Jaipur - Pink City Arts">Jaipur - Pink City Arts</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dynamic Category Form Sections -->
+        <!-- Performing Arts Details Section (Dramatics, Music, Dance, Rituals) -->
+        <div id="performingFields" class="hidden space-y-4 border-t border-orange-100 pt-4">
+          <h4 class="font-bold text-xs text-brandTerracotta uppercase tracking-wider"><i class="fa-solid fa-masks-theater mr-1"></i> Performing Arts & Rituals Details</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Language</label>
+              <input type="text" id="perfLang" placeholder="e.g. Kannada / Sanskrit" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Genre</label>
+              <input type="text" id="perfGenre" placeholder="e.g. Classical Yakshagana" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Base Cost (₹)</label>
+              <input type="number" id="perfCost" placeholder="500" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Created By / Troupe Leader</label>
+              <input type="text" id="perfCreatedBy" placeholder="e.g. Guru Ananth Rao" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Image URL</label>
+              <input type="url" id="perfImg" placeholder="https://..." class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-600 mb-1">About the Experience</label>
+            <textarea id="perfAboutExp" rows="2" placeholder="Describe the live show..." class="w-full px-3 py-1.5 border rounded text-xs"></textarea>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">About the Artist</label>
+              <textarea id="perfAboutArtist" rows="2" placeholder="Artist background & awards..." class="w-full px-3 py-1.5 border rounded text-xs"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">History of the Performance</label>
+              <textarea id="perfHistory" rows="2" placeholder="Historical origins of art form..." class="w-full px-3 py-1.5 border rounded text-xs"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Heritage Experiences Details Section -->
+        <div id="heritageFields" class="hidden space-y-4 border-t border-orange-100 pt-4">
+          <h4 class="font-bold text-xs text-amber-700 uppercase tracking-wider"><i class="fa-solid fa-landmark mr-1"></i> Heritage Experience Details</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Language</label>
+              <input type="text" id="heritLang" placeholder="e.g. English & Kannada" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Genre / Walk Type</label>
+              <input type="text" id="heritGenre" placeholder="e.g. Temple Architecture Trail" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Base Cost (₹)</label>
+              <input type="number" id="heritCost" placeholder="750" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">End Product / Takeaway</label>
+              <input type="text" id="heritEndProd" placeholder="e.g. Traditional Brass Souvenir & Map" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">About the Orator / Guide</label>
+              <input type="text" id="heritOrator" placeholder="e.g. Historian Dr. Meera" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-600 mb-1">General Description of the Place</label>
+            <textarea id="heritDescPlace" rows="2" placeholder="History & significance of location..." class="w-full px-3 py-1.5 border rounded text-xs"></textarea>
+          </div>
+        </div>
+
+        <!-- Handicrafts Details Section -->
+        <div id="handicraftFields" class="hidden space-y-4 border-t border-orange-100 pt-4">
+          <h4 class="font-bold text-xs text-handicrafts uppercase tracking-wider"><i class="fa-solid fa-jar mr-1"></i> Handicraft Product Details</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Subcategory</label>
+              <select id="craftSubcat" class="w-full px-3 py-1.5 border rounded text-xs">
+                <option value="Jewellery">Jewellery (Accessories)</option>
+                <option value="Bags">Bags (Accessories)</option>
+                <option value="Clothes">Clothes (Accessories)</option>
+                <option value="Home Decor">Home Decor (Accessories)</option>
+                <option value="Footwear">Footwear (Accessories)</option>
+                <option value="Paintings">Paintings</option>
+                <option value="Furniture">Furniture</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Product Title</label>
+              <input type="text" id="craftTitle" placeholder="e.g. Hand-carved Teak Coffee Table" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Base Price (₹)</label>
+              <input type="number" id="craftCost" placeholder="4500" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Dimensions (Length x Width in feet)</label>
+              <input type="text" id="craftDimensions" placeholder="e.g. 4ft x 2.5ft x 1.8ft" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Shop / Studio Address</label>
+              <input type="text" id="craftShopAddr" placeholder="e.g. Shop #14, Temple Street, Malleshwaram" class="w-full px-3 py-1.5 border rounded text-xs">
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Banking Account & Financial Settings -->
+        <div class="border-t border-orange-200 pt-4 space-y-4 bg-orange-50/50 p-4 rounded-xl">
+          <h4 class="font-bold text-xs text-brandDark uppercase tracking-wider flex items-center justify-between">
+            <span><i class="fa-solid fa-building-columns mr-1 text-brandTerracotta"></i> Bank Account Details & Payment Rules</span>
+            <span class="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-normal">+2% Customer Platform Fee Applied</span>
+          </h4>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs text-gray-700 font-medium mb-1">Bank Account Number</label>
+              <input type="password" required value="9876543210123" class="w-full px-3 py-1.5 border rounded text-xs bg-white">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-700 font-medium mb-1">IFSC / SWIFT Code</label>
+              <input type="text" required value="SBIN0001234" class="w-full px-3 py-1.5 border rounded text-xs uppercase bg-white">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-700 font-medium mb-1">UPI ID for Direct Payouts</label>
+              <input type="text" required value="artisan@upi" class="w-full px-3 py-1.5 border rounded text-xs bg-white">
+            </div>
+          </div>
+
+          <!-- Offline Payment Toggle Rule -->
+          <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-orange-200">
+            <div>
+              <p class="text-xs font-bold text-gray-800">Allow Direct Offline / Cash Payment at Venue?</p>
+              <p class="text-[11px] text-gray-500">When enabled, customers can choose to pay cash in-person upon arrival.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="offlinePayToggle" checked class="sr-only peer">
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brandTerracotta"></div>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-brandDark hover:bg-black text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-cloud-arrow-up text-brandTerracotta"></i>
+          <span>Publish Cultural Listing to Local Area</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Performance & Heritage Details View with Interactive Seat Selection -->
+  <div id="detailModal" class="fixed inset-0 bg-brandDark/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl relative border border-orange-100">
+      <button onclick="closeModal('detailModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-lg z-10">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div id="detailContent">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Handicrafts AI Room Visualizer & Furniture AR Measurement Tool -->
+  <div id="visualizerModal" class="fixed inset-0 bg-brandDark/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[95vh] overflow-y-auto p-6 shadow-2xl relative">
+      <button onclick="closeModal('visualizerModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-lg z-10">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="border-b border-gray-100 pb-3 mb-4">
+        <span class="text-xs font-bold text-brandTerracotta uppercase tracking-wider"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> AI Room Visualizer & AR Spatial Tool</span>
+        <h3 id="visProductTitle" class="font-serif text-2xl font-bold text-brandDark">Preview Item in Your Home</h3>
+        <p class="text-xs text-gray-500">Test how paintings or handcrafted furniture fit into your space before visiting the store.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Interactive Canvas Preview -->
+        <div class="lg:col-span-2 space-y-3">
+          <div class="relative w-full h-80 sm:h-96 rounded-xl overflow-hidden bg-gray-900 border border-gray-300 flex items-center justify-center">
+            <canvas id="roomCanvas" class="w-full h-full block cursor-move"></canvas>
+
+            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur text-white px-3 py-1.5 rounded-md text-[11px] font-medium flex items-center space-x-2">
+              <i class="fa-solid fa-hand-pointer text-amber-400"></i>
+              <span>Drag & Scale Item inside Room</span>
+            </div>
+          </div>
+
+          <!-- Controls for Drag / Scale -->
+          <div class="flex items-center justify-between bg-orange-50 p-3 rounded-xl border border-orange-200">
+            <div class="flex items-center space-x-3">
+              <label class="text-xs font-bold text-gray-700">Item Size:</label>
+              <input type="range" id="itemScaleSlider" min="0.2" max="2" step="0.05" value="1" oninput="updateItemScale(this.value)" class="accent-brandTerracotta cursor-pointer">
+            </div>
+            <button onclick="resetRoomCanvas()" class="text-xs font-bold text-gray-600 hover:text-brandDark">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Reset Position
+            </button>
+          </div>
+        </div>
+
+        <!-- Room Upload & AR Dimension Measurement Tool -->
+        <div class="space-y-4 text-xs">
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+            <h4 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-camera text-brandTerracotta mr-1"></i> 1. Select Room Photo</h4>
+            <p class="text-gray-500 text-[11px]">Choose a background preset or upload a picture of your room wall/floor.</p>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="loadRoomPreset('living')" class="p-2 border rounded-lg hover:border-brandTerracotta text-left bg-white font-medium">Living Room</button>
+              <button onclick="loadRoomPreset('bedroom')" class="p-2 border rounded-lg hover:border-brandTerracotta text-left bg-white font-medium">Gallery Wall</button>
+            </div>
+
+            <div>
+              <label class="block text-gray-600 mb-1">Upload Custom Room Photo</label>
+              <input type="file" id="roomUploadInput" accept="image/*" onchange="handleRoomUpload(event)" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-orange-100 file:text-amber-900 hover:file:bg-orange-200">
+            </div>
+          </div>
+
+          <!-- AR Spatial Spot Measurement Box -->
+          <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 space-y-3">
+            <h4 class="font-bold text-amber-900 text-sm flex items-center justify-between">
+              <span><i class="fa-solid fa-ruler-combined text-brandTerracotta mr-1"></i> 2. AR Spot Measuring</span>
+              <span class="text-[10px] bg-amber-200 px-1.5 py-0.5 rounded">Fit Checker</span>
+            </h4>
+            <p class="text-gray-600 text-[11px]">Enter your available room spot dimensions to verify fit against this craft item.</p>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-gray-600 text-[10px] uppercase font-bold">Spot Width (ft)</label>
+                <input type="number" id="spotWidth" value="5" oninput="calculateARFit()" class="w-full px-2 py-1 border rounded bg-white text-xs">
+              </div>
+              <div>
+                <label class="text-gray-600 text-[10px] uppercase font-bold">Spot Depth (ft)</label>
+                <input type="number" id="spotDepth" value="3" oninput="calculateARFit()" class="w-full px-2 py-1 border rounded bg-white text-xs">
+              </div>
+            </div>
+
+            <div id="arFitStatus" class="p-2.5 rounded-lg font-semibold text-center text-xs bg-green-100 text-green-800 border border-green-300">
+              <i class="fa-solid fa-circle-check mr-1"></i> Item comfortably fits in your spot!
+            </div>
+          </div>
+
+          <button onclick="proceedToCraftCheckout()" class="w-full bg-brandTerracotta hover:bg-orange-700 text-white font-bold py-2.5 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-store"></i>
+            <span>Book Visit to Shop & Buy</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: Checkout & Automated Digital Receipt Confirmation Modal -->
+  <div id="checkoutModal" class="fixed inset-0 bg-brandDark/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative border border-orange-100">
+      <button onclick="closeModal('checkoutModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center mb-4">
+        <div class="w-12 h-12 rounded-full bg-orange-100 text-brandTerracotta flex items-center justify-center mx-auto text-xl mb-1">
+          <i class="fa-solid fa-receipt"></i>
+        </div>
+        <h3 class="font-serif text-2xl font-bold text-brandDark">Booking & Payment Confirmation</h3>
+        <p class="text-xs text-gray-500">Transparent customer platform pricing (+2% fee included)</p>
+      </div>
+
+      <!-- Price Breakdown Card -->
+      <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-4 space-y-2 text-xs">
+        <div class="flex justify-between font-bold text-brandDark text-sm pb-2 border-b">
+          <span id="checkoutItemTitle">Yakshagana Dramatic Performance</span>
+          <span id="checkoutBaseCostDisplay">₹500.00</span>
+        </div>
+        
+        <div class="flex justify-between text-gray-600">
+          <span>Custodian Base Price:</span>
+          <span id="checkoutBasePrice">₹500.00</span>
+        </div>
+        <div class="flex justify-between text-gray-600">
+          <span>Platform Service Charge (+2%):</span>
+          <span id="checkoutPlatformFee">₹10.00</span>
+        </div>
+        <div id="seatFeeRow" class="flex justify-between text-gray-600 hidden">
+          <span>Selected Seats Count:</span>
+          <span id="checkoutSeatCount">1 Seat</span>
+        </div>
+
+        <div class="flex justify-between font-bold text-brandDark text-base pt-2 border-t border-gray-300">
+          <span>Total Customer Payment:</span>
+          <span id="checkoutTotalAmount" class="text-brandTerracotta">₹510.00</span>
+        </div>
+      </div>
+
+      <!-- Payment Method Selection -->
+      <form onsubmit="handleFinalPaymentSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Select Payment Method</label>
+          <div class="space-y-2 text-xs">
+            <label class="flex items-center justify-between p-3 border rounded-xl cursor-pointer hover:bg-orange-50 has-[:checked]:border-brandTerracotta has-[:checked]:bg-orange-50">
+              <div class="flex items-center space-x-2">
+                <input type="radio" name="payMethod" value="Online Gateway" checked class="accent-brandTerracotta">
+                <span class="font-semibold">Online Gateway (UPI / Cards / Net Banking)</span>
+              </div>
+              <i class="fa-solid fa-credit-card text-brandTerracotta"></i>
+            </label>
+
+            <label id="offlinePayOption" class="flex items-center justify-between p-3 border rounded-xl cursor-pointer hover:bg-orange-50 has-[:checked]:border-brandTerracotta has-[:checked]:bg-orange-50">
+              <div class="flex items-center space-x-2">
+                <input type="radio" name="payMethod" value="Offline Venue Pay" class="accent-brandTerracotta">
+                <span class="font-semibold">Direct Offline Payment at Venue / Shop</span>
+              </div>
+              <span class="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded">Pay Cash Later</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Email for Booking Ticket & Receipt Dispatch</label>
+          <input type="email" id="checkoutUserEmail" required placeholder="your.email@domain.com" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:border-brandTerracotta">
+        </div>
+
+        <button type="submit" class="w-full bg-brandTerracotta hover:bg-orange-700 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-lock"></i>
+          <span>Confirm & Issue Ticket / Receipt</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 6: Final Generated Ticket & Email Receipt Confirmation -->
+  <div id="receiptModal" class="fixed inset-0 bg-brandDark/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-orange-100">
+      <button onclick="closeModal('receiptModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Digital Printable Pass -->
+      <div id="printableReceipt" class="border-2 border-dashed border-orange-300 p-5 rounded-2xl bg-amber-50/40 relative">
+        <div class="flex justify-between items-start mb-4 pb-3 border-b border-orange-200">
+          <div>
+            <span class="font-serif font-bold text-xl text-brandDark block">KalaSutra Ticket</span>
+            <span id="receiptBookingId" class="text-[10px] text-gray-500 font-mono">ID: #KS-2026-8891</span>
+          </div>
+          <span class="text-xs font-bold text-white bg-green-600 px-2.5 py-1 rounded-full shadow-xs">CONFIRMED</span>
+        </div>
+
+        <div class="space-y-2 text-xs text-gray-800 mb-4">
+          <p><span class="font-semibold text-gray-500">Item / Show:</span> <strong id="recItemName" class="text-brandDark"></strong></p>
+          <p><span class="font-semibold text-gray-500">Custodian:</span> <span id="recCustodian"></span></p>
+          <p><span class="font-semibold text-gray-500">Selected Location:</span> <span id="recLocation"></span></p>
+          <p><span class="font-semibold text-gray-500">Customer Email:</span> <span id="recEmail" class="font-medium text-brandTerracotta"></span></p>
+          <p id="recSeatRow" class="hidden"><span class="font-semibold text-gray-500">Reserved Seats:</span> <span id="recSeats" class="font-bold text-indigo-700"></span></p>
+          <p><span class="font-semibold text-gray-500">Payment Status:</span> <span id="recPayMethod" class="font-bold"></span></p>
+          <p><span class="font-semibold text-gray-500">Total Paid (inc. 2% fee):</span> <strong id="recTotalPaid" class="text-brandTerracotta text-sm"></strong></p>
+        </div>
+
+        <div class="bg-white p-3 rounded-xl border border-orange-200 flex items-center justify-between text-xs">
+          <div class="space-y-1">
+            <p class="font-bold text-gray-800"><i class="fa-solid fa-envelope-circle-check text-green-600 mr-1"></i> Email Dispatched</p>
+            <p class="text-[11px] text-gray-500">Confirmation copy sent to your inbox.</p>
+          </div>
+          <i class="fa-solid fa-qrcode text-3xl text-gray-700"></i>
+        </div>
+      </div>
+
+      <div class="mt-4 flex space-x-2">
+        <button onclick="printReceipt()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2.5 rounded-xl text-xs transition border border-gray-300">
+          <i class="fa-solid fa-print mr-1"></i> Print Ticket
+        </button>
+        <button onclick="closeModal('receiptModal')" class="flex-1 bg-brandTerracotta hover:bg-orange-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. DEMO CUSTODIANS & CULTURAL LISTINGS DATA STORE
+       ========================================================================== */
+    let currentArea = "Bengaluru - Malleshwaram";
+    let currentUserRole = "Viewer"; // 'Viewer' or 'Custodian'
+    let selectedCategoryFilter = "All";
+    let selectedCraftSubFilter = "All";
+    let activeListingForBooking = null;
+    let selectedSeatsList = [];
+
+    // Category Color Mapping Definition
+    const CATEGORY_COLORS = {
+      "Dramatics": "#e63946",
+      "Music": "#1d3557",
+      "Dance": "#2a9d8f",
+      "Rituals": "#7209b7",
+      "Heritage Experiences": "#e9c46a",
+      "Handicrafts": "#f4a261"
+    };
+
+    // Pre-populated Custodian & Visitor Data
+    let listingsData = [
+      {
+        id: "CUST-101",
+        artistName: "Yakshagana Kala Kendra",
+        category: "Dramatics",
+        location: "Bengaluru - Malleshwaram",
+        title: "Traditional Yakshagana Epic: Sugriva Vijaya",
+        language: "Kannada",
+        genre: "Folk Mythological Drama",
+        baseCost: 500,
+        createdBy: "Guru Shankara Bhat",
+        aboutExp: "A high-energy traditional night theater performance featuring elaborate facial makeup, vibrant costumes, and rhythmic drum beat improvisations.",
+        aboutArtist: "Preserving 400-year-old coastal Karnataka folk theater styles with over 1,200 stage performances nationwide.",
+        history: "Yakshagana originated in coastal Karnataka as a temple art form blending music, dance, and unscripted Kannada dialogues.",
+        img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80",
+        allowOfflinePay: true,
+        mapX: 0.25,
+        mapY: 0.35,
+        isSeatedShow: true
+      },
+      {
+        id: "CUST-102",
+        artistName: "Carnatic Strings Ensemble",
+        category: "Music",
+        location: "Bengaluru - Malleshwaram",
+        title: "Classical Veena & Flute Morning Ragas",
+        language: "Sanskrit / Instrumental",
+        genre: "Carnatic Classical Music",
+        baseCost: 750,
+        createdBy: "Vidwan Dr. Raghavan",
+        aboutExp: "An intimate acoustic classical concert exploring soulful ragas, rhythmic solo passages, and ancient South Indian compositions.",
+        aboutArtist: "Renowned Veena virtuoso with 30 years of devotion to classic South Indian musical heritage.",
+        history: "Carnatic music traces back to ancient Vedic chants, emphasized heavily during the Vijayanagara Empire era.",
+        img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
+        allowOfflinePay: true,
+        mapX: 0.60,
+        mapY: 0.25,
+        isSeatedShow: true
+      },
+      {
+        id: "CUST-103",
+        artistName: "Nritya Natya Guild",
+        category: "Dance",
+        location: "Bengaluru - Malleshwaram",
+        title: "Bharatanatyam Recital: Abhinaya & Sculptural Poses",
+        language: "Tamil / Sanskrit",
+        genre: "Classical Dance",
+        baseCost: 600,
+        createdBy: "Smt. Rukmini Devi Troupe",
+        aboutExp: "Mesmerizing recital showcasing intricate footwork, hand mudras, and expressive storytelling based on classical poetry.",
+        aboutArtist: "Award-winning troupe dedicated to purity of Bharatanatyam and youth mentorship.",
+        history: "Bharatanatyam originated in the temples of Tamil Nadu and is detailed in Bharata Muni's Natya Shastra.",
+        img: "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=800&q=80",
+        allowOfflinePay: false,
+        mapX: 0.75,
+        mapY: 0.65,
+        isSeatedShow: true
+      },
+      {
+        id: "CUST-104",
+        artistName: "Sacred Fire Heritage Trust",
+        category: "Rituals",
+        location: "Bengaluru - Malleshwaram",
+        title: "Vedic Chanting & Sacred Ritual Experience",
+        language: "Sanskrit",
+        genre: "Sacred Ritual & Chanting",
+        baseCost: 400,
+        createdBy: "Veda Pathashala Scholars",
+        aboutExp: "Participate in an immersive traditional Vedic chanting session with symbolic floral offerings and peaceful ambient acoustics.",
+        aboutArtist: "Hereditary scholars trained in pristine oral recitation techniques passed down through generations.",
+        history: "UNESCO recognized Vedic chanting as an intangible heritage of humanity due to its exact tonal conservation.",
+        img: "https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80",
+        allowOfflinePay: true,
+        mapX: 0.35,
+        mapY: 0.70,
+        isSeatedShow: false
+      },
+      {
+        id: "CUST-105",
+        artistName: "Malleshwaram Heritage Walkers",
+        category: "Heritage Experiences",
+        location: "Bengaluru - Malleshwaram",
+        title: "Old Bangalore Temple & Silk Weaver Trail",
+        language: "English & Kannada",
+        genre: "Architectural & Cultural Walking Tour",
+        baseCost: 850,
+        endProduct: "Handcrafted Brass Bookmark & Traditional Filter Coffee",
+        orator: "Historian Suresh Jayaram",
+        placeDesc: "Explore 17th-century Kadu Malleshwara temple, ancient stepwells, and traditional silk marketplace alleys.",
+        img: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=800&q=80",
+        allowOfflinePay: true,
+        mapX: 0.45,
+        mapY: 0.45,
+        isSeatedShow: false
+      },
+      {
+        id: "CUST-106",
+        artistName: "Royal Mysore Wood & Craft Studio",
+        category: "Handicrafts",
+        craftSubcategory: "Furniture",
+        location: "Bengaluru - Malleshwaram",
+        title: "Hand-Carved Rosewood & Inlay Coffee Table",
+        baseCost: 8500,
+        shopAddr: "Studio #22, Sampige Road, Malleshwaram",
+        dimensions: "4ft x 2.5ft x 1.8ft",
+        aboutExp: "Elegantly carved solid wood table featuring floral brass inlay crafted by master wood artisans.",
+        img: "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=800&q=80",
+        allowOfflinePay: true,
+        mapX: 0.82,
+        mapY: 0.30,
+        isSeatedShow: false
+      },
+      {
+        id: "CUST-107",
+        artistName: "Channapatna Craft Collective",
+        category: "Handicrafts",
+        craftSubcategory: "Home Decor",
+        location: "Bengaluru - Malleshwaram",
+        title: "Eco-Friendly Lacquerware Wooden Lamp",
+        baseCost: 2200,
+        shopAddr: "Craft Shed #5, Margosa Road",
+        dimensions: "1.5ft x 1.5ft x 2.5ft",
+        aboutExp: "Non-toxic vegetable dyed wooden table lamp turned on traditional lathes.",
+        img: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80",
+        allowOfflinePay: true,
+        mapX: 0.18,
+        mapY: 0.55,
+        isSeatedShow: false
+      },
+      {
+        id: "CUST-108",
+        artistName: "Tanjore Gold Leaf Atelier",
+        category: "Handicrafts",
+        craftSubcategory: "Paintings",
+        location: "Bengaluru - Malleshwaram",
+        title: "Sacred Ganesha Tanjore Painting with Gold Foil",
+        baseCost: 12500,
+        shopAddr: "Gallery 8, 8th Main Malleshwaram",
+        dimensions: "2.5ft x 3ft",
+        aboutExp: "Authentic Tanjore artwork studded with semi-precious Jaipur gems and 22k gold leaf foil.",
+        img: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+        allowOfflinePay: true,
+        mapX: 0.50,
+        mapY: 0.80,
+        isSeatedShow: false
+      }
+    ];
+
+    /* ==========================================================================
+       2. MAP ENGINE (CANVAS BASED WITH COLOR-CODED MARKERS)
+       ========================================================================== */
+    let canvas, ctx;
+    let hoveredPin = null;
+
+    function initMapCanvas() {
+      canvas = document.getElementById('interactiveMapCanvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+
+      // Adjust pixel density
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      canvas.addEventListener('mousemove', handleMapMouseMove);
+      canvas.addEventListener('click', handleMapClick);
+
+      drawMap();
+    }
+
+    function drawMap() {
+      if (!ctx) return;
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Clear & Background
+      ctx.fillStyle = '#fefae0';
+      ctx.fillRect(0, 0, w, h);
+
+      // Draw stylized map grid & river paths
+      ctx.strokeStyle = '#e9ecef';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y < h; y += 40) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      // Draw stylized area roads
+      ctx.strokeStyle = '#dee2e6';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.4); ctx.quadraticCurveTo(w * 0.5, h * 0.3, w, h * 0.6);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(w * 0.3, 0); ctx.quadraticCurveTo(w * 0.4, h * 0.6, w * 0.7, h);
+      ctx.stroke();
+
+      // Filter listings for current selected location
+      const localListings = listingsData.filter(item => item.location === currentArea || true); // show current area
+
+      // Draw Custodian Markers
+      localListings.forEach(item => {
+        const px = item.mapX * w;
+        const py = item.mapY * h;
+        const color = CATEGORY_COLORS[item.category] || '#c85a32';
+        const isHovered = hoveredPin && hoveredPin.id === item.id;
+
+        // Pulse ring if hovered
+        if (isHovered) {
+          ctx.beginPath();
+          ctx.arc(px, py, 18, 0, Math.PI * 2);
+          ctx.fillStyle = color + '44';
+          ctx.fill();
+        }
+
+        // Marker Pin Shadow
+        ctx.beginPath();
+        ctx.arc(px + 2, py + 2, 10, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.fill();
+
+        // Outer Pin Circle
+        ctx.beginPath();
+        ctx.arc(px, py, 11, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        // Inner Dot
+        ctx.beginPath();
+        ctx.arc(px, py, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+      });
+    }
+
+    function handleMapMouseMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const w = canvas.width;
+      const h = canvas.height;
+
+      let found = null;
+      listingsData.forEach(item => {
+        const px = item.mapX * w;
+        const py = item.mapY * h;
+        const dist = Math.hypot(mx - px, my - py);
+        if (dist < 15) {
+          found = item;
+        }
+      });
+
+      hoveredPin = found;
+      const tooltip = document.getElementById('mapTooltip');
+
+      if (found) {
+        canvas.style.cursor = 'pointer';
+        tooltip.style.left = (mx + 15) + 'px';
+        tooltip.style.top = (my - 10) + 'px';
+        document.getElementById('tooltipTitle').innerText = found.artistName;
+        document.getElementById('tooltipCategory').innerText = found.category + " • " + found.title;
+        document.getElementById('tooltipCategory').style.color = CATEGORY_COLORS[found.category];
+        document.getElementById('tooltipDesc').innerText = "Price: ₹" + found.baseCost;
+        tooltip.classList.remove('hidden');
+      } else {
+        canvas.style.cursor = 'crosshair';
+        tooltip.classList.add('hidden');
+      }
+
+      drawMap();
+    }
+
+    function handleMapClick(e) {
+      if (hoveredPin) {
+        openItemDetail(hoveredPin.id);
+      }
+    }
+
+    function resetMapZoom() {
+      hoveredPin = null;
+      drawMap();
+    }
+
+    /* ==========================================================================
+       3. UI CONTROLS & DYNAMIC CARD GRID RENDERING
+       ========================================================================== */
+    function renderListings() {
+      const grid = document.getElementById('listingsGrid');
+      grid.innerHTML = '';
+
+      let filtered = listingsData.filter(item => {
+        const matchesArea = (item.location === currentArea);
+        const matchesCat = (selectedCategoryFilter === 'All' || item.category === selectedCategoryFilter);
+        const matchesCraftSub = (selectedCategoryFilter !== 'Handicrafts' || selectedCraftSubFilter === 'All' || item.craftSubcategory === selectedCraftSubFilter);
+        return matchesArea && matchesCat && matchesCraftSub;
+      });
+
+      // Fallback if no exact area match in demo data: show nearby matches
+      if (filtered.length === 0) {
+        filtered = listingsData.filter(item => {
+          return (selectedCategoryFilter === 'All' || item.category === selectedCategoryFilter);
+        });
+      }
+
+      document.getElementById('resultsCount').innerText = `Showing ${filtered.length} listings`;
+
+      filtered.forEach(item => {
+        const catColor = CATEGORY_COLORS[item.category] || '#c85a32';
+        const customerPrice = (item.baseCost * 1.02).toFixed(0);
+
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl overflow-hidden border border-gray-200/80 hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer";
+        card.onclick = () => openItemDetail(item.id);
+
+        card.innerHTML = `
+          <div class="relative h-48 w-full overflow-hidden bg-gray-100">
+            <img src="${item.img}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/800x600/f4a261/ffffff?text=Cultural+Art'">
+            <span class="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded-full shadow" style="background-color: ${catColor}; color: #fff;">
+              ${item.category} ${item.craftSubcategory ? '• ' + item.craftSubcategory : ''}
+            </span>
+            <span class="absolute bottom-3 right-3 bg-brandDark/80 backdrop-blur text-white font-bold text-xs px-2.5 py-1 rounded-md">
+              ₹${customerPrice} <span class="text-[9px] text-orange-200 font-normal">(inc. 2% fee)</span>
+            </span>
+          </div>
+
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center space-x-1 text-xs text-brandTerracotta font-semibold mb-1">
+                <i class="fa-solid fa-user-check text-[10px]"></i>
+                <span>${item.artistName}</span>
+              </div>
+              <h3 class="font-serif font-bold text-base text-brandDark group-hover:text-brandTerracotta transition line-clamp-1">${item.title}</h3>
+              <p class="text-xs text-gray-500 mt-1 line-clamp-2">${item.aboutExp || item.placeDesc || item.history}</p>
+            </div>
+
+            <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-medium">
+              <span class="text-gray-500"><i class="fa-solid fa-location-dot mr-1 text-gray-400"></i>${item.location.split('-')[1] || item.location}</span>
+              <span class="text-brandTerracotta font-bold group-hover:underline">Explore & Book →</span>
+            </div>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    function handleLocationChange(newLoc) {
+      currentArea = newLoc;
+      document.getElementById('currentAreaDisplay').innerText = newLoc;
+      renderListings();
+      drawMap();
+    }
+
+    function filterCategory(cat) {
+      selectedCategoryFilter = cat;
+      const buttons = document.querySelectorAll('#categoryTabs .cat-tab-btn');
+      buttons.forEach(btn => {
+        if (btn.innerText.includes(cat) || (cat === 'All' && btn.innerText.includes('All Categories'))) {
+          btn.className = "cat-tab-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-brandDark text-white shadow";
+        } else {
+          btn.className = "cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-orange-50";
+        }
+      });
+
+      const subBar = document.getElementById('handicraftSubBar');
+      if (cat === 'Handicrafts') {
+        subBar.classList.remove('hidden');
+      } else {
+        subBar.classList.add('hidden');
+      }
+
+      renderListings();
+    }
+
+    function filterHandicraftSub(sub) {
+      selectedCraftSubFilter = sub;
+      const subBtns = document.querySelectorAll('.craft-sub-btn');
+      subBtns.forEach(btn => {
+        if (btn.innerText.toLowerCase().includes(sub.toLowerCase())) {
+          btn.className = "craft-sub-btn bg-brandTerracotta text-white px-3 py-1 rounded-md font-medium";
+        } else {
+          btn.className = "craft-sub-btn bg-white border text-gray-700 px-3 py-1 rounded-md hover:bg-orange-100";
+        }
+      });
+      renderListings();
+    }
+
+    function handleSearch(query) {
+      const q = query.toLowerCase();
+      const cards = document.querySelectorAll('#listingsGrid > div');
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(q)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    /* ==========================================================================
+       4. AUTHENTICATION & ROLE SWITCHING LOGIC
+       ========================================================================== */
+    function openAuthModal() {
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+
+    function selectAuthRole(role) {
+      currentUserRole = role;
+      const btnV = document.getElementById('roleBtnViewer');
+      const btnC = document.getElementById('roleBtnCustodian');
+      const submitText = document.getElementById('authSubmitRoleText');
+      const note = document.getElementById('custodianQuickNote');
+
+      if (role === 'Custodian') {
+        btnC.className = "py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2 bg-white text-brandDark shadow";
+        btnV.className = "py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2 text-gray-600 hover:text-brandDark";
+        submitText.innerText = "Artisan Custodian";
+        note.classList.remove('hidden');
+      } else {
+        btnV.className = "py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2 bg-white text-brandDark shadow";
+        btnC.className = "py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2 text-gray-600 hover:text-brandDark";
+        submitText.innerText = "Viewer / Customer";
+        note.classList.add('hidden');
+      }
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('authName').value;
+      closeModal('authModal');
+
+      document.getElementById('roleText').innerText = currentUserRole + " Mode (" + name + ")";
+      document.getElementById('authBtnText').innerText = name;
+
+      if (currentUserRole === 'Custodian') {
+        openCustodianModal();
+      }
+    }
+
+    function resetToHome() {
+      filterCategory('All');
+    }
+
+    /* ==========================================================================
+       5. CUSTODIAN ONBOARDING & LISTING PUBLISHING LOGIC
+       ========================================================================== */
+    function openCustodianModal() {
+      document.getElementById('custodianModal').classList.remove('hidden');
+    }
+
+    function toggleCategoryFormFields() {
+      const checks = document.querySelectorAll('.custodian-cat-check:checked');
+      const selectedCats = Array.from(checks).map(c => c.value);
+
+      const perfSec = document.getElementById('performingFields');
+      const heritSec = document.getElementById('heritageFields');
+      const craftSec = document.getElementById('handicraftFields');
+
+      if (selectedCats.some(c => ['Dramatics','Music','Dance','Rituals'].includes(c))) {
+        perfSec.classList.remove('hidden');
+      } else {
+        perfSec.classList.add('hidden');
+      }
+
+      if (selectedCats.includes('Heritage Experiences')) {
+        heritSec.classList.remove('hidden');
+      } else {
+        heritSec.classList.add('hidden');
+      }
+
+      if (selectedCats.includes('Handicrafts')) {
+        craftSec.classList.remove('hidden');
+      } else {
+        craftSec.classList.add('hidden');
+      }
+    }
+
+    function handleCustodianSubmit(e) {
+      e.preventDefault();
+      const artistName = document.getElementById('custodianArtistName').value;
+      const loc = document.getElementById('custodianLocation').value;
+      const allowOffline = document.getElementById('offlinePayToggle').checked;
+
+      const checks = document.querySelectorAll('.custodian-cat-check:checked');
+      if (checks.length === 0) {
+        alert("Please select at least one practice category!");
+        return;
+      }
+
+      checks.forEach(check => {
+        const cat = check.value;
+        let newListing = {
+          id: "CUST-" + Math.floor(100 + Math.random() * 900),
+          artistName: artistName,
+          category: cat,
+          location: loc,
+          allowOfflinePay: allowOffline,
+          mapX: 0.2 + Math.random() * 0.6,
+          mapY: 0.2 + Math.random() * 0.6,
+          baseCost: 500,
+          title: artistName + " " + cat + " Showcase",
+          img: "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=800&q=80"
+        };
+
+        if (['Dramatics','Music','Dance','Rituals'].includes(cat)) {
+          newListing.language = document.getElementById('perfLang').value || "Kannada";
+          newListing.genre = document.getElementById('perfGenre').value || "Classical Art";
+          newListing.baseCost = parseFloat(document.getElementById('perfCost').value) || 500;
+          newListing.createdBy = document.getElementById('perfCreatedBy').value || artistName;
+          newListing.aboutExp = document.getElementById('perfAboutExp').value || "Live performance.";
+          newListing.aboutArtist = document.getElementById('perfAboutArtist').value || "Master practitioner.";
+          newListing.history = document.getElementById('perfHistory').value || "Traditional history.";
+          newListing.isSeatedShow = true;
+          if (document.getElementById('perfImg').value) newListing.img = document.getElementById('perfImg').value;
+        } else if (cat === 'Heritage Experiences') {
+          newListing.language = document.getElementById('heritLang').value || "English";
+          newListing.genre = document.getElementById('heritGenre').value || "Heritage Trail";
+          newListing.baseCost = parseFloat(document.getElementById('heritCost').value) || 750;
+          newListing.endProduct = document.getElementById('heritEndProd').value || "Craft Souvenir";
+          newListing.orator = document.getElementById('heritOrator').value || artistName;
+          newListing.placeDesc = document.getElementById('heritDescPlace').value || "Historical landmark.";
+          newListing.isSeatedShow = false;
+        } else if (cat === 'Handicrafts') {
+          newListing.craftSubcategory = document.getElementById('craftSubcat').value;
+          newListing.title = document.getElementById('craftTitle').value || "Handcrafted Treasure";
+          newListing.baseCost = parseFloat(document.getElementById('craftCost').value) || 2500;
+          newListing.dimensions = document.getElementById('craftDimensions').value || "2ft x 2ft";
+          newListing.shopAddr = document.getElementById('craftShopAddr').value || "Local Craft Market";
+          newListing.aboutExp = "Handcrafted with sustainable material by " + artistName;
+          newListing.isSeatedShow = false;
+        }
+
+        listingsData.unshift(newListing);
+      });
+
+      closeModal('custodianModal');
+      renderListings();
+      drawMap();
+      alert("Success! Your cultural listings have been published live to " + loc);
+    }
+
+    /* ==========================================================================
+       6. ITEM DETAILS, SEAT PICKER & CHECKOUT FLOW
+       ========================================================================== */
+    function openItemDetail(id) {
+      const item = listingsData.find(x => x.id === id);
+      if (!item) return;
+      activeListingForBooking = item;
+      selectedSeatsList = [];
+
+      const container = document.getElementById('detailContent');
+      const catColor = CATEGORY_COLORS[item.category] || '#c85a32';
+      const custPrice = (item.baseCost * 1.02).toFixed(2);
+
+      let innerHTML = `
+        <div class="relative h-64 -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
+          <img src="${item.img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x600/f4a261/ffffff?text=Cultural+Art'">
+          <span class="absolute top-4 left-4 text-xs font-bold px-3 py-1.5 rounded-full shadow" style="background-color: ${catColor}; color: #fff;">
+            ${item.category} ${item.craftSubcategory ? '• ' + item.craftSubcategory : ''}
+          </span>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-xs font-bold text-brandTerracotta uppercase tracking-wider">${item.artistName}</span>
+              <h2 class="font-serif text-2xl font-bold text-brandDark">${item.title}</h2>
+            </div>
+            <div class="text-right">
+              <span class="text-xl font-bold text-brandTerracotta block">₹${custPrice}</span>
+              <span class="text-[10px] text-gray-500">Includes 2% Platform Fee</span>
+            </div>
+          </div>
+
+          <!-- Specific Fields per Category -->
+      `;
+
+      if (['Dramatics','Music','Dance','Rituals'].includes(item.category)) {
+        innerHTML += `
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-orange-50 p-3 rounded-xl border border-orange-200 text-xs">
+            <div><span class="text-gray-500 block">Language:</span> <strong>${item.language}</strong></div>
+            <div><span class="text-gray-500 block">Genre:</span> <strong>${item.genre}</strong></div>
+            <div><span class="text-gray-500 block">Created By:</span> <strong>${item.createdBy}</strong></div>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <p><strong>About the Experience:</strong> ${item.aboutExp}</p>
+            <p><strong>About the Artist:</strong> ${item.aboutArtist}</p>
+            <p><strong>History of Performance:</strong> ${item.history}</p>
+          </div>
+
+          <!-- Interactive Seat Selection Grid for Seated Shows -->
+          <div class="border-t border-gray-200 pt-4 mt-4">
+            <h4 class="font-bold text-xs uppercase tracking-wider text-brandDark mb-2 flex items-center justify-between">
+              <span><i class="fa-solid fa-chair text-brandTerracotta mr-1"></i> Pick Your Show Seats</span>
+              <span class="text-[10px] font-normal text-gray-500">Screen / Stage Direction ↑</span>
+            </h4>
+
+            <div class="bg-gray-900 p-4 rounded-xl text-center text-white text-xs mb-3 font-semibold shadow-inner">
+              STAGE / PERFORMANCE AREA
+            </div>
+
+            <div class="grid grid-cols-8 gap-2 max-w-sm mx-auto mb-3" id="seatGridContainer">
+              <!-- Seats A1-E8 generated below -->
+            </div>
+
+            <div class="flex justify-center space-x-4 text-[11px] font-medium text-gray-600">
+              <span class="flex items-center"><span class="w-3 h-3 bg-white border border-gray-400 rounded mr-1"></span> Available</span>
+              <span class="flex items-center"><span class="w-3 h-3 bg-brandTerracotta rounded mr-1"></span> Selected</span>
+              <span class="flex items-center"><span class="w-3 h-3 bg-gray-300 rounded mr-1"></span> Reserved</span>
+            </div>
+          </div>
+        `;
+      } else if (item.category === 'Heritage Experiences') {
+        innerHTML += `
+          <div class="grid grid-cols-2 gap-2 bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs">
+            <div><span class="text-gray-500 block">Language:</span> <strong>${item.language}</strong></div>
+            <div><span class="text-gray-500 block">Genre:</span> <strong>${item.genre}</strong></div>
+            <div><span class="text-gray-500 block">Orator / Historian:</span> <strong>${item.orator}</strong></div>
+            <div><span class="text-gray-500 block">Takeaway Product:</span> <strong>${item.endProduct}</strong></div>
+          </div>
+          <div class="text-xs space-y-2">
+            <p><strong>Place Description & History:</strong> ${item.placeDesc}</p>
+          </div>
+        `;
+      } else if (item.category === 'Handicrafts') {
+        innerHTML += `
+          <div class="grid grid-cols-2 gap-2 bg-orange-50 p-3 rounded-xl border border-orange-200 text-xs">
+            <div><span class="text-gray-500 block">Subcategory:</span> <strong>${item.craftSubcategory}</strong></div>
+            <div><span class="text-gray-500 block">Dimensions:</span> <strong>${item.dimensions}</strong></div>
+            <div class="col-span-2"><span class="text-gray-500 block">Shop / Studio Address:</span> <strong>${item.shopAddr}</strong></div>
+          </div>
+          <p class="text-xs"><strong>Craft Details:</strong> ${item.aboutExp}</p>
+
+          <!-- AI Visualizer Trigger for Paintings & Furniture -->
+          ${['Furniture','Paintings','Home Decor'].includes(item.craftSubcategory) ? `
+            <button onclick="openRoomVisualizer()" class="w-full bg-gradient-to-r from-amber-600 to-brandTerracotta text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-md">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>Test Fit in Your House with AI Visualizer</span>
+            </button>
+          ` : ''}
+        `;
+      }
+
+      innerHTML += `
+        <div class="pt-4 border-t border-gray-200 flex space-x-3">
+          <button onclick="proceedToCheckout()" class="flex-1 bg-brandTerracotta hover:bg-orange-700 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-ticket"></i>
+            <span>Proceed to Book & Pay (₹${custPrice})</span>
+          </button>
+        </div>
+      `;
+
+      container.innerHTML = innerHTML;
+      document.getElementById('detailModal').classList.remove('hidden');
+
+      // Generate Seat Grid if applicable
+      if (['Dramatics','Music','Dance','Rituals'].includes(item.category)) {
+        renderSeatGrid();
+      }
+    }
+
+    function renderSeatGrid() {
+      const grid = document.getElementById('seatGridContainer');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const rows = ['A','B','C','D'];
+      rows.forEach(r => {
+        for (let i = 1; i <= 8; i++) {
+          const seatId = r + i;
+          const isReserved = (r === 'A' && (i === 3 || i === 4)); // demo reserved
+          const isSelected = selectedSeatsList.includes(seatId);
+
+          const seatBtn = document.createElement('button');
+          seatBtn.type = 'button';
+          seatBtn.className = `w-8 h-8 rounded text-[10px] font-bold transition flex items-center justify-center border ${
+            isReserved ? 'bg-gray-200 text-gray-400 cursor-not-allowed border-gray-300' :
+            isSelected ? 'bg-brandTerracotta text-white border-brandTerracotta shadow-sm' :
+            'bg-white text-gray-700 border-gray-300 hover:border-brandTerracotta'
+          }`;
+          seatBtn.innerText = seatId;
+          if (!isReserved) {
+            seatBtn.onclick = () => toggleSeatSelect(seatId);
+          }
+          grid.appendChild(seatBtn);
+        }
+      });
+    }
+
+    function toggleSeatSelect(seatId) {
+      if (selectedSeatsList.includes(seatId)) {
+        selectedSeatsList = selectedSeatsList.filter(s => s !== seatId);
+      } else {
+        selectedSeatsList.push(seatId);
+      }
+      renderSeatGrid();
+    }
+
+    /* ==========================================================================
+       7. AI ROOM VISUALIZER & AR SPOT MEASUREMENT CANVAS
+       ========================================================================== */
+    let roomCanvas, roomCtx;
+    let roomImage = new Image();
+    let craftImage = new Image();
+    let itemPos = { x: 200, y: 150, scale: 0.8 };
+    let isDraggingItem = false;
+    let dragStart = { x: 0, y: 0 };
+
+    function openRoomVisualizer() {
+      closeModal('detailModal');
+      document.getElementById('visualizerModal').classList.remove('hidden');
+      document.getElementById('visProductTitle').innerText = activeListingForBooking.title;
+
+      initRoomCanvas();
+    }
+
+    function initRoomCanvas() {
+      roomCanvas = document.getElementById('roomCanvas');
+      if (!roomCanvas) return;
+      roomCtx = roomCanvas.getContext('2d');
+
+      const rect = roomCanvas.getBoundingClientRect();
+      roomCanvas.width = rect.width;
+      roomCanvas.height = rect.height;
+
+      // Default background preset
+      roomImage.crossOrigin = "anonymous";
+      roomImage.src = "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80";
+      
+      craftImage.crossOrigin = "anonymous";
+      craftImage.src = activeListingForBooking.img;
+
+      roomImage.onload = () => redrawRoomCanvas();
+      craftImage.onload = () => redrawRoomCanvas();
+
+      // Drag Events
+      roomCanvas.onmousedown = (e) => {
+        isDraggingItem = true;
+        dragStart = { x: e.clientX - itemPos.x, y: e.clientY - itemPos.y };
+      };
+      roomCanvas.onmousemove = (e) => {
+        if (isDraggingItem) {
+          itemPos.x = e.clientX - dragStart.x;
+          itemPos.y = e.clientY - dragStart.y;
+          redrawRoomCanvas();
+        }
+      };
+      roomCanvas.onmouseup = () => isDraggingItem = false;
+
+      calculateARFit();
+    }
+
+    function redrawRoomCanvas() {
+      if (!roomCtx) return;
+      const w = roomCanvas.width;
+      const h = roomCanvas.height;
+
+      roomCtx.clearRect(0, 0, w, h);
+
+      // Draw background room
+      if (roomImage.complete && roomImage.naturalWidth !== 0) {
+        roomCtx.drawImage(roomImage, 0, 0, w, h);
+      }
+
+      // Draw overlaid craft item with scale & shadow
+      if (craftImage.complete && craftImage.naturalWidth !== 0) {
+        const itemW = 180 * itemPos.scale;
+        const itemH = 140 * itemPos.scale;
+
+        roomCtx.save();
+        roomCtx.shadowColor = 'rgba(0,0,0,0.5)';
+        roomCtx.shadowBlur = 15;
+        roomCtx.shadowOffsetY = 10;
+
+        roomCtx.drawImage(craftImage, itemPos.x, itemPos.y, itemW, itemH);
+        roomCtx.restore();
+      }
+    }
+
+    function updateItemScale(val) {
+      itemPos.scale = parseFloat(val);
+      redrawRoomCanvas();
+    }
+
+    function resetRoomCanvas() {
+      itemPos = { x: roomCanvas.width / 3, y: roomCanvas.height / 3, scale: 0.8 };
+      document.getElementById('itemScaleSlider').value = 0.8;
+      redrawRoomCanvas();
+    }
+
+    function loadRoomPreset(preset) {
+      if (preset === 'living') {
+        roomImage.src = "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80";
+      } else {
+        roomImage.src = "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=1000&q=80";
+      }
+      roomImage.onload = () => redrawRoomCanvas();
+    }
+
+    function handleRoomUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          roomImage.src = evt.target.result;
+          roomImage.onload = () => redrawRoomCanvas();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function calculateARFit() {
+      const w = parseFloat(document.getElementById('spotWidth').value) || 0;
+      const d = parseFloat(document.getElementById('spotDepth').value) || 0;
+
+      const status = document.getElementById('arFitStatus');
+      if (w >= 4 && d >= 2) {
+        status.className = "p-2.5 rounded-lg font-semibold text-center text-xs bg-green-100 text-green-800 border border-green-300";
+        status.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Perfect Fit! Your spot (${w}ft x ${d}ft) accommodates this item.`;
+      } else {
+        status.className = "p-2.5 rounded-lg font-semibold text-center text-xs bg-amber-100 text-amber-800 border border-amber-300";
+        status.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Tight Fit: Item dimensions recommended min 4ft x 2ft.`;
+      }
+    }
+
+    function proceedToCraftCheckout() {
+      closeModal('visualizerModal');
+      proceedToCheckout();
+    }
+
+    /* ==========================================================================
+       8. FINAL CHECKOUT, RECEIPT GENERATION & EMAIL DISPATCH
+       ========================================================================== */
+    function proceedToCheckout() {
+      closeModal('detailModal');
+      const item = activeListingForBooking;
+      if (!item) return;
+
+      document.getElementById('checkoutItemTitle').innerText = item.title;
+      
+      const numSeats = selectedSeatsList.length > 0 ? selectedSeatsList.length : 1;
+      const baseTotal = item.baseCost * numSeats;
+      const fee = baseTotal * 0.02;
+      const total = baseTotal + fee;
+
+      document.getElementById('checkoutBasePrice').innerText = "₹" + baseTotal.toFixed(2);
+      document.getElementById('checkoutPlatformFee').innerText = "₹" + fee.toFixed(2);
+      document.getElementById('checkoutTotalAmount').innerText = "₹" + total.toFixed(2);
+
+      if (selectedSeatsList.length > 0) {
+        document.getElementById('seatFeeRow').classList.remove('hidden');
+        document.getElementById('checkoutSeatCount').innerText = selectedSeatsList.join(', ');
+      } else {
+        document.getElementById('seatFeeRow').classList.add('hidden');
+      }
+
+      // Offline pay toggle check
+      const offlineOpt = document.getElementById('offlinePayOption');
+      if (!item.allowOfflinePay) {
+        offlineOpt.classList.add('hidden');
+      } else {
+        offlineOpt.classList.remove('hidden');
+      }
+
+      document.getElementById('checkoutModal').classList.remove('hidden');
+    }
+
+    function handleFinalPaymentSubmit(e) {
+      e.preventDefault();
+      const userEmail = document.getElementById('checkoutUserEmail').value;
+      const payMethod = document.querySelector('input[name="payMethod"]:checked').value;
+      
+      closeModal('checkoutModal');
+
+      const item = activeListingForBooking;
+      const numSeats = selectedSeatsList.length > 0 ? selectedSeatsList.length : 1;
+      const total = (item.baseCost * numSeats * 1.02).toFixed(2);
+
+      // Populate Receipt Modal
+      document.getElementById('receiptBookingId').innerText = "ID: #KS-" + Math.floor(100000 + Math.random()*900000);
+      document.getElementById('recItemName').innerText = item.title;
+      document.getElementById('recCustodian').innerText = item.artistName;
+      document.getElementById('recLocation').innerText = item.location;
+      document.getElementById('recEmail').innerText = userEmail;
+      document.getElementById('recPayMethod').innerText = payMethod;
+      document.getElementById('recTotalPaid').innerText = "₹" + total;
+
+      if (selectedSeatsList.length > 0) {
+        document.getElementById('recSeatRow').classList.remove('hidden');
+        document.getElementById('recSeats').innerText = selectedSeatsList.join(', ');
+      } else {
+        document.getElementById('recSeatRow').classList.add('hidden');
+      }
+
+      document.getElementById('receiptModal').classList.remove('hidden');
+    }
+
+    function printReceipt() {
+      window.print();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    /* ==========================================================================
+       9. INITIALIZATION ON PAGE LOAD
+       ========================================================================== */
+    window.onload = function() {
+      initMapCanvas();
+      renderListings();
+
+      window.addEventListener('resize', () => {
+        initMapCanvas();
+      });
+    };
+  </script>
+</body>
+</html>
